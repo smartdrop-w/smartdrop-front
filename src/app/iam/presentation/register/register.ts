@@ -19,6 +19,9 @@ export class RegisterComponent {
   confirmPassword = '';
   showPassword = false;
   showConfirm = false;
+  errorMessage = '';
+  successMessage = '';
+  isLoading = false;
 
   constructor(
     private authService: AuthService,
@@ -27,23 +30,31 @@ export class RegisterComponent {
   ) {}
 
   onRegister() {
+    this.errorMessage = '';
+    this.successMessage = '';
+
     if (!this.email || !this.password) {
-      alert('Por favor, llena los campos');
+      this.errorMessage = 'Por favor, llena los campos requeridos.';
       return;
     }
 
     if (this.password !== this.confirmPassword) {
-      alert('Las contraseñas no coinciden');
+      this.errorMessage = 'Las contraseñas no coinciden.';
       return;
     }
 
+    this.isLoading = true;
     this.authService.register(this.email, this.password, this.fullName).subscribe({
       next: () => {
-        alert('Usuario guardado con éxito');
-        this.router.navigate(['/login']);
+        this.isLoading = false;
+        this.successMessage = '¡Usuario registrado con éxito! Redirigiendo al inicio de sesión...';
+        setTimeout(() => {
+          this.router.navigate(['/login']);
+        }, 1500);
       },
       error: () => {
-        alert('Error al registrar usuario. Inténtalo de nuevo.');
+        this.isLoading = false;
+        this.errorMessage = 'Error al registrar usuario. Inténtalo de nuevo o prueba con otro correo.';
       }
     });
   }

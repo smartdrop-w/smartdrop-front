@@ -21,6 +21,9 @@
       <h2 class="login-title">{{ language.t('register') }}</h2>
       <p class="login-subtitle">{{ language.t('registerSubtitle') }}</p>
 
+      <div *ngIf="errorMessage" class="alert-box error">{{ errorMessage }}</div>
+      <div *ngIf="successMessage" class="alert-box success">{{ successMessage }}</div>
+
       <form class="login-form" (submit)="$event.preventDefault()">
 
         <div class="input-group">
@@ -83,9 +86,11 @@
         <button
           type="button"
           class="btn-primary"
+          [disabled]="isLoading"
           (click)="onRegister()">
-          <span>{{ language.t('createAccount') }}</span>
-          <span class="material-icons">person_add</span>
+          <span>{{ isLoading ? 'Creando cuenta...' : language.t('createAccount') }}</span>
+          <span class="material-icons" *ngIf="!isLoading">person_add</span>
+          <span class="material-icons rotating" *ngIf="isLoading">sync</span>
         </button>
 
         <div class="divider"><span>{{ language.t('orContinueWith') }}</span></div>

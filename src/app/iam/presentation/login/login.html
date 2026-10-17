@@ -23,6 +23,9 @@
       <h2 class="login-title">{{ language.t('login') }}</h2>
       <p class="login-subtitle">{{ language.t('loginSubtitle') }}</p>
 
+      <div *ngIf="errorMessage" class="alert-box error">{{ errorMessage }}</div>
+      <div *ngIf="infoMessage" class="alert-box info">{{ infoMessage }}</div>
+
       <form class="login-form" (ngSubmit)="onLogin()">
 
         <div class="input-group">
@@ -62,9 +65,10 @@
           <a routerLink="/forgot-password" class="forgot-link">{{ language.t('forgotPassword') }}</a>
         </div>
 
-        <button type="submit" class="btn-primary">
-          <span>{{ language.t('login') }}</span>
-          <span class="material-icons">arrow_forward</span>
+        <button type="submit" class="btn-primary" [disabled]="isLoading">
+          <span>{{ isLoading ? 'Iniciando sesión...' : language.t('login') }}</span>
+          <span class="material-icons" *ngIf="!isLoading">arrow_forward</span>
+          <span class="material-icons rotating" *ngIf="isLoading">sync</span>
         </button>
 
         <div class="divider">

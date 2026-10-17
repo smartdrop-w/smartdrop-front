@@ -15,7 +15,7 @@ export interface SmartDropUser {
   providedIn: 'root',
 })
 export class AuthService {
-  public readonly apiUrl = 'https://smartdrop-api.duckdns.org';
+  public readonly apiUrl = 'https://smartdrop-backend.onrender.com';
   private readonly currentUserKey = 'smartdrop-current-user-v2';
   private readonly defaultEmail = 'smartdrop@gmail.com';
 
@@ -34,7 +34,7 @@ export class AuthService {
           return of({ requires2FA: true, simulatedCode: res.simulatedCode });
         }
         if (res && res.userId) {
-          return this.http.get<boolean>(`${this.apiUrl}/api/iam/auth/users/${res.userId}/has-role/ADMIN`).pipe(
+          return this.http.get<boolean>(`${this.apiUrl}/api/iam/auth/users/${res.userId}/has-role/ROLE_ADMIN`).pipe(
             map((isAdmin) => {
               const user: SmartDropUser = {
                 id: res.userId,

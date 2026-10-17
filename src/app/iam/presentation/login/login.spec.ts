@@ -2,6 +2,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { LoginComponent } from './login';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MatIconModule } from '@angular/material/icon';
+import { provideRouter } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http';
 
 describe('Login', () => {
   let component: LoginComponent;
@@ -14,7 +16,7 @@ describe('Login', () => {
         TranslateModule.forRoot(),
         MatIconModule
       ],
-      providers: [TranslateService]
+      providers: [TranslateService, provideRouter([]), provideHttpClient()]
     }).compileComponents();
 
     fixture = TestBed.createComponent(LoginComponent);
