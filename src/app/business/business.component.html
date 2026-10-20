@@ -45,6 +45,29 @@
         <button class="btn-ghost-sm" (click)="showForm = false">{{ language.t('cancel') }}</button>
       </div>
 
+      <!-- FORMULARIO REGISTRAR CONSUMO (POST /api/v1/inventory/consumptions) -->
+      <div class="inline-form compact-form" *ngIf="showConsumptionForm" style="background: #f0f9ff; border: 1.5px solid #0284c7; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
+        <h4 style="margin: 0 0 10px 0; color: #0369a1; font-weight: 700;">💧 Registrar Consumo de Agua: {{ selectedTankForConsumption?.name }}</h4>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end;">
+          <div class="form-group" style="flex: 1; min-width: 140px;">
+            <label style="display: block; font-size: 12px; font-weight: 600; color: #1e293b; margin-bottom: 4px;">Volumen a consumir (Litros):</label>
+            <input type="number" min="1" [max]="selectedTankForConsumption?.current || 1000" [(ngModel)]="consumptionForm.volumeUsed" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px;">
+          </div>
+          <div class="form-group" style="flex: 2; min-width: 220px;">
+            <label style="display: block; font-size: 12px; font-weight: 600; color: #1e293b; margin-bottom: 4px;">Contexto de uso (máx 50 car.):</label>
+            <input type="text" maxlength="50" [(ngModel)]="consumptionForm.usageContext" placeholder="Ej: Lavado de fermentador cónico" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px;">
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn-primary" (click)="recordConsumption()" [disabled]="isRecordingConsumption" style="background: #0284c7; color: white; border: none; padding: 9px 16px; border-radius: 6px; font-weight: 600; cursor: pointer;">
+              {{ isRecordingConsumption ? 'Registrando...' : 'Confirmar Consumo' }}
+            </button>
+            <button class="btn-ghost-sm" (click)="showConsumptionForm = false" style="padding: 9px 14px; border: 1px solid #cbd5e1; background: white; border-radius: 6px; cursor: pointer;">
+              Cancelar
+            </button>
+          </div>
+        </div>
+      </div>
+
       <div class="tank-list">
         <div class="tank-item" *ngFor="let t of tanks; let i = index">
           <div class="tank-icon">
@@ -57,6 +80,7 @@
               <div class="tank-fill" [style.width.%]="getLevel(t)" [ngClass]="{ 'low': getLevel(t) < 30 }"></div>
             </div>
             <div class="row-actions">
+              <button class="btn-primary-sm" (click)="openConsumptionModal(t)" style="background: #0284c7; color: white; border: none; padding: 5px 12px; border-radius: 4px; font-weight: 600; cursor: pointer;">💧 Consumo</button>
               <button class="btn-ghost-sm" (click)="openForm(i)">{{ language.t('edit') }}</button>
               <button class="btn-ghost-sm" (click)="replenish(i)">{{ language.t('refill') }}</button>
               <button class="btn-ghost-sm" (click)="removeTank(i)">{{ language.t('remove') }}</button>

@@ -27,6 +27,13 @@ export class BusinessComponent implements OnInit {
   editingIndex: number | null = null;
   form: Tank = this.emptyTank();
   message = '';
+  isSaving = false;
+
+  // Consumptions integration (POST /api/v1/inventory/consumptions)
+  showConsumptionForm = false;
+  selectedTankForConsumption: Tank | null = null;
+  consumptionForm = { volumeUsed: 50, usageContext: 'Proceso de producción y lavado' };
+  isRecordingConsumption = false;
 
   constructor(
     public language: LanguageService,
@@ -138,6 +145,66 @@ export class BusinessComponent implements OnInit {
       this.tanks.splice(index, 1);
       this.message = `${tank.name} removed.`;
     }
+  }
+
+  openConsumptionModal(tank: Tank) {
+    this.selectedTankForConsumption = tank;
+    this.consumptionForm = {
+      volumeUsed: Math.min(50, tank.current > 0 ? tank.current : 20),
+      usageContext: 'Proceso de cocción y lavado de tanque'
+    };
+    this.showConsumptionForm = true;
+    this.showForm = false;
+  }
+
+  recordConsumption() {
+    if (!this.selectedTankForConsumption || !this.selectedTankForConsumption.tankId) {
+      this.message = 'Selecciona un tanque válido para registrar consumo.';
+      return;
+    }
+    const vol = Number(this.consumptionForm.volumeUsed);
+    if (vol <= 0) {
+      this.message = 'El volumen a consumir debe ser mayor a 0 L.';
+      return;
+    }
+    if (vol > this.selectedTankForConsumption.current) {
+      this.message = `El volumen excede el líquido actual del tanque (${this.selectedTankForConsumption.current}L).`;
+      return;
+    }
+    const context = (this.consumptionForm.usageContext || 'Consumo operativo').substring(0, 50);
+
+    const user = this.authService.getCurrentUser();
+    const userId = user.id || 1;
+
+    this.isRecordingConsumption = true;
+    this.http.post<any>(`${this.authService.apiUrl}/api/v1/inventory/consumptions`, {
+      userId,
+      volumeUsed: vol,
+      usageContext: context
+    }).subscribe({
+      next: () => {
+        // Update tank local current volume
+        this.selectedTankForConsumption!.current = Math.max(0, this.selectedTankForConsumption!.current - vol);
+        
+        // Sync updated tank level with backend
+        this.http.put<Tank>(`${this.authService.apiUrl}/api/v1/inventory/tanks/${this.selectedTankForConsumption!.tankId}`, {
+          name: this.selectedTankForConsumption!.name,
+          capacity: this.selectedTankForConsumption!.capacity,
+          current: this.selectedTankForConsumption!.current,
+          liquidType: this.selectedTankForConsumption!.liquidType || 'WATER'
+        }).subscribe();
+
+        this.message = `Consumo de ${vol}L registrado con éxito en ${this.selectedTankForConsumption!.name}.`;
+        this.showConsumptionForm = false;
+        this.isRecordingConsumption = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.isRecordingConsumption = false;
+        this.message = err?.error?.detail || 'Error al registrar consumo en el servidor.';
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   private emptyTank(): Tank {
