@@ -1,5 +1,16 @@
 .reports-page { max-width: 1000px; }
 
+.action-message {
+  padding: 12px 16px;
+  background: #e0f2fe;
+  color: #0369a1;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-left: 4px solid #00B4D8;
+}
+
 .page-header {
   margin-bottom: 24px;
   h1 { font-size: 1.6rem; font-weight: 700; color: #0f172a; margin: 0 0 4px; }
@@ -58,6 +69,10 @@
   white-space: nowrap;
   transition: background 0.15s;
   &:hover { background: #0096c7; }
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
 }
 
 .charts-row {

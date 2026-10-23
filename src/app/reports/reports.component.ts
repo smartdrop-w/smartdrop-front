@@ -1,6 +1,7 @@
 import { Component, AfterViewInit, ElementRef, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 import { LanguageService } from '../shared/language/language.service';
 import { AuthService } from '../iam/infrastructure/services/auth.service';
 
@@ -23,6 +24,7 @@ export class ReportsComponent implements AfterViewInit {
   waterSaved = 2340;
   costSaved = 156;
   message = '';
+  isGenerating = false;
   trendData = [45, 52, 48, 61, 55, 67, 58];
   costData = [189, 145, 210, 167, 195, 178, 156];
 
@@ -32,7 +34,12 @@ export class ReportsComponent implements AfterViewInit {
     { name: 'Efficiency Report', date: 'Generated 2 weeks ago' },
   ];
 
-  constructor(public language: LanguageService, private authService: AuthService, private cdr: ChangeDetectorRef) {
+  constructor(
+    public language: LanguageService,
+    private authService: AuthService,
+    private http: HttpClient,
+    private cdr: ChangeDetectorRef
+  ) {
     this.storageKey = this.authService.getStorageKey('reports');
     if (!this.authService.isDefaultUser()) {
       this.efficiencyScore = 0;
@@ -52,12 +59,48 @@ export class ReportsComponent implements AfterViewInit {
     this.efficiencyScore = Math.min(98, Math.max(55, 100 - Math.round(this.trendData.reduce((a, b) => a + b, 0) / 16)));
     this.waterSaved = this.efficiencyScore * 28;
     this.costSaved = Math.round(this.efficiencyScore * 1.8);
+
+    const reportTitle = `${this.reportType} - ${this.location}`;
+    const reportDateStr = `Generado para ${this.timePeriod}`;
+
     this.recentReports.unshift({
-      name: `${this.reportType} - ${this.location}`,
-      date: `Generated for ${this.timePeriod}`,
+      name: reportTitle,
+      date: reportDateStr,
     });
-    this.message = 'Report generated with the selected filters.';
-    this.save();
+    this.message = 'Generando reporte y sincronizando con base de datos...';
+    this.isGenerating = true;
+
+    const user = this.authService.getCurrentUser();
+    const userId = user.id || 1;
+
+    // Persist to backend: POST /api/v1/analytics/reports
+    const payload = {
+      userId,
+      title: reportTitle,
+      content: `Reporte de eficiencia hídrica SmartDrop para ${this.location} (${this.timePeriod}). Score: ${this.efficiencyScore}%. Agua ahorrada: ${this.waterSaved}L.`,
+      type: this.reportType,
+      metrics: [
+        { name: 'efficiencyScore', value: this.efficiencyScore, unit: '%' },
+        { name: 'waterSaved', value: this.waterSaved, unit: 'L' },
+        { name: 'costSaved', value: this.costSaved, unit: 'USD' }
+      ]
+    };
+
+    this.http.post<any>(`${this.authService.apiUrl}/api/v1/analytics/reports`, payload).subscribe({
+      next: () => {
+        this.message = 'Reporte generado y guardado exitosamente en TiDB Cloud.';
+        this.isGenerating = false;
+        this.save();
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.message = 'Reporte generado localmente.';
+        this.isGenerating = false;
+        this.save();
+        this.cdr.detectChanges();
+      }
+    });
+
     this.cdr.detectChanges();
     setTimeout(() => {
       this.drawTrendChart();
@@ -78,14 +121,33 @@ export class ReportsComponent implements AfterViewInit {
 
   private load() {
     const saved = localStorage.getItem(this.storageKey);
-    if (!saved) return;
-    const data = JSON.parse(saved);
-    this.efficiencyScore = data.efficiencyScore ?? this.efficiencyScore;
-    this.waterSaved = data.waterSaved ?? this.waterSaved;
-    this.costSaved = data.costSaved ?? this.costSaved;
-    this.trendData = data.trendData ?? this.trendData;
-    this.costData = data.costData ?? this.costData;
-    this.recentReports = data.recentReports ?? this.recentReports;
+    if (saved) {
+      const data = JSON.parse(saved);
+      this.efficiencyScore = data.efficiencyScore ?? this.efficiencyScore;
+      this.waterSaved = data.waterSaved ?? this.waterSaved;
+      this.costSaved = data.costSaved ?? this.costSaved;
+      this.trendData = data.trendData ?? this.trendData;
+      this.costData = data.costData ?? this.costData;
+      this.recentReports = data.recentReports ?? this.recentReports;
+    }
+
+    const user = this.authService.getCurrentUser();
+    const userId = user.id || 1;
+
+    // Load persisted reports from backend
+    this.http.get<any[]>(`${this.authService.apiUrl}/api/v1/analytics/reports?userId=${userId}`).subscribe({
+      next: (serverReports) => {
+        if (serverReports && serverReports.length > 0) {
+          const mapped = serverReports.map(r => ({
+            name: r.title,
+            date: r.createdAt ? new Date(r.createdAt).toLocaleDateString() : 'Persistido en TiDB'
+          }));
+          this.recentReports = [...mapped, ...this.recentReports.slice(0, 3)];
+          this.cdr.detectChanges();
+        }
+      },
+      error: () => {}
+    });
   }
 
   downloadReport(report = { name: `${this.reportType} Report`, date: 'Generated now' }) {
