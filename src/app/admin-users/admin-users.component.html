@@ -1,9 +1,14 @@
 <div class="users-page">
-  <div class="page-header">
-    <h1>{{ language.t('users') }}</h1>
-    <p>Manage all registered users in the platform</p>
+  <div class="page-header" style="display: flex; justify-content: space-between; align-items: center;">
+    <div>
+      <h1>{{ language.t('users') }}</h1>
+      <p>Manage all registered users in the platform</p>
+    </div>
+    <button class="btn-primary" (click)="loadUsers()" [disabled]="isLoading" style="cursor: pointer; padding: 8px 16px; border-radius: 6px; border: none; background: #00B4D8; color: #fff; font-weight: 600;">
+      {{ isLoading ? 'Loading...' : 'Refresh Users' }}
+    </button>
   </div>
-  <div class="action-message" *ngIf="message">{{ message }}</div>
+  <div class="action-message" *ngIf="message" style="margin-bottom: 15px; padding: 10px; background: #e0f2fe; color: #0369a1; border-radius: 6px;">{{ message }}</div>
 
   <div class="card">
     <div class="users-table-container">

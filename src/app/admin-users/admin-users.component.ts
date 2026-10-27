@@ -21,6 +21,7 @@ interface UserResponseDto {
 export class AdminUsersComponent implements OnInit {
   users: UserResponseDto[] = [];
   message = '';
+  isLoading = false;
 
   constructor(
     public language: LanguageService,
@@ -39,13 +40,21 @@ export class AdminUsersComponent implements OnInit {
       return;
     }
 
-    this.http.get<UserResponseDto[]>(`${this.authService.apiUrl}/api/identity/auth/users`).subscribe({
+    this.isLoading = true;
+    this.http.get<any[]>(`${this.authService.apiUrl}/api/iam/auth/users`).subscribe({
       next: (data) => {
-        this.users = data || [];
+        this.users = (data || []).map((u: any) => ({
+          id: u.userId ?? u.id,
+          fullName: u.fullName || 'No name',
+          email: u.email,
+          createdAt: u.createdAt
+        }));
+        this.isLoading = false;
         this.cdr.detectChanges();
       },
       error: () => {
-        this.message = 'Failed to load users.';
+        this.message = 'Failed to load users from server.';
+        this.isLoading = false;
         this.cdr.detectChanges();
       }
     });
