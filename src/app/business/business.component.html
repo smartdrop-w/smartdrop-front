@@ -47,7 +47,7 @@
 
       <!-- FORMULARIO REGISTRAR CONSUMO (POST /api/v1/inventory/consumptions) -->
       <div class="inline-form compact-form" *ngIf="showConsumptionForm" style="background: #f0f9ff; border: 1.5px solid #0284c7; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
-        <h4 style="margin: 0 0 10px 0; color: #0369a1; font-weight: 700;">💧 Registrar Consumo de Agua: {{ selectedTankForConsumption?.name }}</h4>
+        <h4 style="margin: 0 0 10px 0; color: #0369a1; font-weight: 700;">Registrar Consumo de Agua: {{ selectedTankForConsumption?.name }}</h4>
         <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end;">
           <div class="form-group" style="flex: 1; min-width: 140px;">
             <label style="display: block; font-size: 12px; font-weight: 600; color: #1e293b; margin-bottom: 4px;">Volumen a consumir (Litros):</label>
@@ -80,7 +80,7 @@
               <div class="tank-fill" [style.width.%]="getLevel(t)" [ngClass]="{ 'low': getLevel(t) < 30 }"></div>
             </div>
             <div class="row-actions">
-              <button class="btn-primary-sm" (click)="openConsumptionModal(t)" style="background: #0284c7; color: white; border: none; padding: 5px 12px; border-radius: 4px; font-weight: 600; cursor: pointer;">💧 Consumo</button>
+              <button class="btn-primary-sm" (click)="openConsumptionModal(t)" style="background: #0284c7; color: white; border: none; padding: 5px 12px; border-radius: 4px; font-weight: 600; cursor: pointer;">Consumo</button>
               <button class="btn-ghost-sm" (click)="openForm(i)">{{ language.t('edit') }}</button>
               <button class="btn-ghost-sm" (click)="replenish(i)">{{ language.t('refill') }}</button>
               <button class="btn-ghost-sm" (click)="removeTank(i)">{{ language.t('remove') }}</button>

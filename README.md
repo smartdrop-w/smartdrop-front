@@ -1,26 +1,26 @@
 # SmartDrop - Frontend Web Application
 
-Este repositorio contiene la aplicación frontend de **SmartDrop**, construida con **Angular 21** y **Angular Material**, integrada con la arquitectura de microservicios desplegada en Render Cloud y persistida en TiDB Serverless.
+Este repositorio contiene la aplicación frontend oficial de **SmartDrop**, desarrollada con **Angular 19** y **Angular Material**, integrada con la arquitectura de microservicios distribuida desplegada en Render Cloud y persistida en TiDB Cloud Serverless.
 
-## 🚀 Tecnologías
+## Tecnologías
 
-- **Framework:** Angular 21 (Standalone Components)
-- **UI Components:** Angular Material & Custom SCSS Design System
+- **Framework:** Angular 19 (Standalone Components)
+- **UI Components:** Angular Material & SCSS Design System
 - **Testing:** Vitest / Angular CLI Testing Framework
 - **Bundler:** Vite
 - **Internacionalización:** ngx-translate (Soporte ES / EN)
 - **Backend API:** Spring Boot Microservices (`https://smartdrop-backend.onrender.com`)
 
-## 📋 Módulos y Flujos Implementados
+## Módulos y Flujos Implementados
 
 1. **Autenticación e IAM:**
    - Registro de usuarios con validaciones inline y confirmación de contraseña.
-   - Inicio de sesión con soporte para 2FA simulado y JWT Token.
-   - Roles de usuario (`ROLE_ADMIN`, `ROLE_BREWER`, `ROLE_USER`).
+   - Inicio de sesión con soporte para verificación de dos factores (2FA) y JWT Token.
+   - Control de acceso basado en roles (`ROLE_ADMIN`, `ROLE_BREWER`, `ROLE_USER`).
 2. **Gestión de Usuarios (Admin):**
    - Listado de usuarios registrados en el sistema (`GET /api/iam/auth/users`).
 3. **Monitoreo e Inventario (Business):**
-   - Gestión de tanques industriales/residenciales (`GET`, `POST`, `PUT`, `DELETE /api/v1/inventory/tanks`).
+   - Gestión integral de tanques industriales y residenciales (`GET`, `POST`, `PUT`, `DELETE /api/v1/inventory/tanks`).
    - Reabastecimiento de niveles de líquido (`PUT /api/v1/inventory/tanks/{id}/replenish`).
    - Registro y deducción de consumo de agua por tanque (`POST /api/v1/inventory/consumptions`).
 4. **Reportes y Analítica:**
@@ -30,7 +30,7 @@ Este repositorio contiene la aplicación frontend de **SmartDrop**, construida c
 5. **Dashboard y Monitoreo IoT:**
    - Panel de control en tiempo real con niveles de tanques y métricas clave.
 
-## 🛠️ Instalación y Ejecución
+## Instalación y Ejecución
 
 ```bash
 # 1. Instalar dependencias

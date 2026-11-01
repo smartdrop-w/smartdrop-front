@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AlertsComponent } from './alerts.component';
 import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { TranslateModule } from '@ngx-translate/core';
 
 describe('AlertsComponent', () => {
@@ -10,12 +11,11 @@ describe('AlertsComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [AlertsComponent, TranslateModule.forRoot()],
-      providers: [provideHttpClient()]
+      providers: [provideHttpClient(), provideHttpClientTesting()]
     }).compileComponents();
 
     fixture = TestBed.createComponent(AlertsComponent);
     component = fixture.componentInstance;
-    await fixture.whenStable();
   });
 
   it('should create alerts incident monitor component', () => {

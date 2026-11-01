@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BusinessComponent } from './business.component';
 import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { TranslateModule } from '@ngx-translate/core';
 
 describe('BusinessComponent', () => {
@@ -10,12 +11,11 @@ describe('BusinessComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [BusinessComponent, TranslateModule.forRoot()],
-      providers: [provideHttpClient()]
+      providers: [provideHttpClient(), provideHttpClientTesting()]
     }).compileComponents();
 
     fixture = TestBed.createComponent(BusinessComponent);
     component = fixture.componentInstance;
-    await fixture.whenStable();
   });
 
   it('should create business tanks component', () => {

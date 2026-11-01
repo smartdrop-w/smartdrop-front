@@ -40,7 +40,7 @@ export class LoginComponent {
         this.isLoading = false;
         if (res && res.requires2FA) {
           if (res.simulatedCode) {
-            this.infoMessage = '🔑 Código 2FA simulado: ' + res.simulatedCode;
+            this.infoMessage = 'Código 2FA simulado: ' + res.simulatedCode;
           }
           this.router.navigate(['/2fa-verify'], { queryParams: { email: this.email } });
         } else if (res) {

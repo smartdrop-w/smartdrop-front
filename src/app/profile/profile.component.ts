@@ -208,7 +208,7 @@ export class ProfileComponent implements OnInit {
     }).subscribe({
       next: () => {
         this.is2FAEnabled = false;
-        this.showMessage('⚠️ Two-Factor Authentication has been DISABLED. Your account is less secure.');
+        this.showMessage('Two-Factor Authentication has been DISABLED. Your account is less secure.');
         this.cdr.detectChanges();
       },
       error: () => {
