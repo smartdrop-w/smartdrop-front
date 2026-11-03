@@ -67,6 +67,10 @@ export class AuthService {
     localStorage.removeItem(this.currentUserKey);
   }
 
+  isLoggedIn(): boolean {
+    return !!localStorage.getItem(this.currentUserKey);
+  }
+
   forgotPassword(email: string): Observable<any> {
     return this.http.post(`${this.apiUrl}/api/iam/auth/forgot-password`, { email });
   }
@@ -81,19 +85,34 @@ export class AuthService {
 
   verify2FA(email: string, code: string): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/api/iam/auth/2fa/verify`, { email, code }).pipe(
-      map(res => {
-         if (res && res.userId) {
-           const user: SmartDropUser = {
-              id: res.userId,
-              email: res.email,
-              fullName: res.fullName,
-              isAdmin: false, // In a real app, you would fetch roles again
-           };
-           localStorage.setItem(this.currentUserKey, JSON.stringify(user));
-           return true;
-         }
-         return false;
-      })
+      switchMap((res) => {
+        if (res && res.userId) {
+          return this.http.get<boolean>(`${this.apiUrl}/api/iam/auth/users/${res.userId}/has-role/ROLE_ADMIN`).pipe(
+            map((isAdmin) => {
+              const user: SmartDropUser = {
+                id: res.userId,
+                email: res.email,
+                fullName: res.fullName,
+                isAdmin: isAdmin,
+              };
+              localStorage.setItem(this.currentUserKey, JSON.stringify(user));
+              return true;
+            }),
+            catchError(() => {
+              const user: SmartDropUser = {
+                id: res.userId,
+                email: res.email,
+                fullName: res.fullName,
+                isAdmin: false,
+              };
+              localStorage.setItem(this.currentUserKey, JSON.stringify(user));
+              return of(true);
+            })
+          );
+        }
+        return of(false);
+      }),
+      catchError(() => of(false))
     );
   }
 

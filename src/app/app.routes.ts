@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { LoginComponent } from './iam/presentation/login/login';
 import { RegisterComponent } from './iam/presentation/register/register';
+import { authGuard, adminGuard } from './iam/infrastructure/guards/auth.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -21,6 +22,7 @@ export const routes: Routes = [
   { path: 'dashboard', redirectTo: 'app/dashboard', pathMatch: 'full' },
   {
     path: 'app',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./shared/layout/layout.component').then((m) => m.LayoutComponent),
     children: [
@@ -57,6 +59,7 @@ export const routes: Routes = [
       },
       {
         path: 'admin-users',
+        canActivate: [adminGuard],
         loadComponent: () =>
           import('./admin-users/admin-users.component').then((m) => m.AdminUsersComponent),
       },
