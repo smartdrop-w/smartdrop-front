@@ -94,6 +94,10 @@ export class BusinessComponent implements OnInit {
           this.showForm = false;
           this.form = this.emptyTank();
           this.cdr.detectChanges();
+        },
+        error: () => {
+          this.message = 'Could not add tank. Please try again.';
+          this.cdr.detectChanges();
         }
       });
     } else {
@@ -106,6 +110,10 @@ export class BusinessComponent implements OnInit {
             this.showForm = false;
             this.form = this.emptyTank();
             this.editingIndex = null;
+            this.cdr.detectChanges();
+          },
+          error: () => {
+            this.message = 'Could not update tank. Please try again.';
             this.cdr.detectChanges();
           }
         });
@@ -121,6 +129,10 @@ export class BusinessComponent implements OnInit {
         next: (res) => {
           this.tanks[index] = res;
           this.message = `${tank.name} replenished.`;
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.message = 'Could not replenish tank.';
           this.cdr.detectChanges();
         }
       });
@@ -138,6 +150,10 @@ export class BusinessComponent implements OnInit {
         next: () => {
           this.tanks.splice(index, 1);
           this.message = `${tank.name} removed.`;
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.message = 'Could not remove tank.';
           this.cdr.detectChanges();
         }
       });

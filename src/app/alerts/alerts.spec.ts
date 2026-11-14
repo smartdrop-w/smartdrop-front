@@ -2,7 +2,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AlertsComponent } from './alerts.component';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { TranslateModule } from '@ngx-translate/core';
 
 describe('AlertsComponent', () => {
   let component: AlertsComponent;
@@ -10,7 +9,7 @@ describe('AlertsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AlertsComponent, TranslateModule.forRoot()],
+      imports: [AlertsComponent],
       providers: [provideHttpClient(), provideHttpClientTesting()]
     }).compileComponents();
 

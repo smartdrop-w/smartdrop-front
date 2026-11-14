@@ -41,104 +41,63 @@ export class ProfileComponent implements OnInit {
   }
 
   updateName() {
-    if (!this.editName.trim()) {
+    const trimmedName = this.editName.trim();
+    if (!trimmedName) {
       this.showMessage('Name cannot be empty.', true);
       return;
     }
 
     const userId = this.currentUser.id || 1;
-
-    // Update profile via existing profiles endpoint
     this.http.get<any>(`${this.authService.apiUrl}/api/v1/profiles/by-user/${userId}`).subscribe({
       next: (profile) => {
         if (profile && profile.profileId) {
-          this.http.put<any>(`${this.authService.apiUrl}/api/v1/profiles/${profile.profileId}`, {
-            fullName: this.editName.trim(),
-            email: this.currentUser.email,
-            language: profile.language || 'en',
-            notificationsEnabled: profile.notificationsEnabled ?? true
-          }).subscribe({
-            next: () => {
-              // Also update in IAM
-              this.http.put<any>(`${this.authService.apiUrl}/api/iam/auth/change-name`, {
-                email: this.currentUser.email,
-                newName: this.editName.trim()
-              }).subscribe({
-                next: () => {
-                  setTimeout(() => {
-                    this.currentUser.fullName = this.editName.trim();
-                    const saved = JSON.parse(localStorage.getItem('smartdrop-current-user-v2') || '{}');
-                    saved.fullName = this.editName.trim();
-                    localStorage.setItem('smartdrop-current-user-v2', JSON.stringify(saved));
-                    this.showMessage('Profile updated successfully.');
-                    this.cdr.detectChanges();
-                  });
-                }
-              });
-            },
-            error: () => this.showMessage('Error updating profile.', true)
-          });
+          this.saveProfileAndSyncName(trimmedName, profile, true);
         } else {
-          // Create profile if it doesn't exist
-          this.http.post<any>(`${this.authService.apiUrl}/api/v1/profiles`, {
-            userId,
-            fullName: this.editName.trim(),
-            email: this.currentUser.email,
-            language: 'en',
-            notificationsEnabled: true
-          }).subscribe({
-            next: () => {
-              // Also update in IAM
-              this.http.put<any>(`${this.authService.apiUrl}/api/iam/auth/change-name`, {
-                email: this.currentUser.email,
-                newName: this.editName.trim()
-              }).subscribe({
-                next: () => {
-                  setTimeout(() => {
-                    this.currentUser.fullName = this.editName.trim();
-                    const saved = JSON.parse(localStorage.getItem('smartdrop-current-user-v2') || '{}');
-                    saved.fullName = this.editName.trim();
-                    localStorage.setItem('smartdrop-current-user-v2', JSON.stringify(saved));
-                    this.showMessage('Profile created and updated.');
-                    this.cdr.detectChanges();
-                  });
-                }
-              });
-            },
-            error: () => this.showMessage('Error creating profile.', true)
-          });
+          this.saveProfileAndSyncName(trimmedName, null, false);
         }
       },
-      error: () => {
-        // Profile doesn't exist, create it
-        this.http.post<any>(`${this.authService.apiUrl}/api/v1/profiles`, {
+      error: () => this.saveProfileAndSyncName(trimmedName, null, false),
+    });
+  }
+
+  private saveProfileAndSyncName(trimmedName: string, profile: any, isUpdate: boolean) {
+    const userId = this.currentUser.id || 1;
+    const request$ = isUpdate
+      ? this.http.put<any>(`${this.authService.apiUrl}/api/v1/profiles/${profile.profileId}`, {
+          fullName: trimmedName,
+          email: this.currentUser.email,
+          language: profile.language || 'en',
+          notificationsEnabled: profile.notificationsEnabled ?? true,
+        })
+      : this.http.post<any>(`${this.authService.apiUrl}/api/v1/profiles`, {
           userId,
-          fullName: this.editName.trim(),
+          fullName: trimmedName,
           email: this.currentUser.email,
           language: 'en',
-          notificationsEnabled: true
-        }).subscribe({
-          next: () => {
-            // Also update in IAM
-            this.http.put<any>(`${this.authService.apiUrl}/api/iam/auth/change-name`, {
-              email: this.currentUser.email,
-              newName: this.editName.trim()
-            }).subscribe({
-              next: () => {
-                setTimeout(() => {
-                  this.currentUser.fullName = this.editName.trim();
-                  const saved = JSON.parse(localStorage.getItem('smartdrop-current-user-v2') || '{}');
-                  saved.fullName = this.editName.trim();
-                  localStorage.setItem('smartdrop-current-user-v2', JSON.stringify(saved));
-                  this.showMessage('Profile created and updated.');
-                  this.cdr.detectChanges();
-                });
-              }
-            });
-          },
-          error: () => this.showMessage('Error creating profile.', true)
+          notificationsEnabled: true,
         });
-      }
+
+    request$.subscribe({
+      next: () => this.syncIamName(trimmedName, isUpdate ? 'Profile updated successfully.' : 'Profile created and updated.'),
+      error: () => this.showMessage(isUpdate ? 'Error updating profile.' : 'Error creating profile.', true),
+    });
+  }
+
+  private syncIamName(trimmedName: string, successMessage: string) {
+    this.http.put<any>(`${this.authService.apiUrl}/api/iam/auth/change-name`, {
+      email: this.currentUser.email,
+      newName: trimmedName,
+    }).subscribe({
+      next: () => {
+        this.currentUser.fullName = trimmedName;
+        this.authService.updateCurrentUserName(trimmedName);
+        this.showMessage(successMessage);
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.showMessage('Error updating account name in IAM.', true);
+        this.cdr.detectChanges();
+      },
     });
   }
 

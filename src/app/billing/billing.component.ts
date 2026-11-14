@@ -143,6 +143,10 @@ export class BillingComponent implements OnInit {
         this.showMethodForm = false;
         this.message = 'Payment method added.';
         this.cdr.detectChanges();
+      },
+      error: () => {
+        this.message = 'Could not add payment method. Please try again.';
+        this.cdr.detectChanges();
       }
     });
   }
@@ -158,6 +162,10 @@ export class BillingComponent implements OnInit {
         next: () => {
           this.paymentMethods.forEach((m, i) => m.primary = i === index);
           this.message = 'Primary payment method updated.';
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.message = 'Could not update primary payment method.';
           this.cdr.detectChanges();
         }
       });
@@ -178,6 +186,10 @@ export class BillingComponent implements OnInit {
             this.setPrimary(0);
           }
           this.message = 'Payment method removed.';
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.message = 'Could not remove payment method.';
           this.cdr.detectChanges();
         }
       });
@@ -209,6 +221,10 @@ export class BillingComponent implements OnInit {
         this.loadTransactions(userId);
         this.message = `$${amount.toFixed(2)} added to wallet.`;
         this.cdr.detectChanges();
+      },
+      error: () => {
+        this.message = 'Could not add funds. Please try again.';
+        this.cdr.detectChanges();
       }
     });
   }
@@ -232,6 +248,10 @@ export class BillingComponent implements OnInit {
         this.loadTransactions(userId);
         this.message = `$${amount.toFixed(2)} withdrawn from wallet.`;
         this.cdr.detectChanges();
+      },
+      error: () => {
+        this.message = 'Could not withdraw funds. Please try again.';
+        this.cdr.detectChanges();
       }
     });
   }
@@ -241,10 +261,7 @@ export class BillingComponent implements OnInit {
   }
 
   private loadSettings() {
-    const saved = localStorage.getItem(this.storageKey);
-    if (saved) {
-      this.settings = JSON.parse(saved);
-    }
+    this.settings = this.authService.readStorageJson(this.storageKey, this.settings);
   }
 
   private loadBillingData() {

@@ -2,7 +2,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BusinessComponent } from './business.component';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { TranslateModule } from '@ngx-translate/core';
 
 describe('BusinessComponent', () => {
   let component: BusinessComponent;
@@ -10,7 +9,7 @@ describe('BusinessComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [BusinessComponent, TranslateModule.forRoot()],
+      imports: [BusinessComponent],
       providers: [provideHttpClient(), provideHttpClientTesting()]
     }).compileComponents();
 

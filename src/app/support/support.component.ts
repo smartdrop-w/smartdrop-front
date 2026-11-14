@@ -71,6 +71,10 @@ export class SupportComponent implements OnInit {
         this.message = 'Support ticket created.';
         this.ticket = { subject: '', priority: 'medium', description: '' };
         this.cdr.detectChanges();
+      },
+      error: () => {
+        this.message = 'Could not create support ticket. Please try again.';
+        this.cdr.detectChanges();
       }
     });
   }
@@ -82,6 +86,10 @@ export class SupportComponent implements OnInit {
         next: () => {
           t.status = 'solved';
           this.message = 'Ticket marked as solved.';
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.message = 'Could not update ticket status.';
           this.cdr.detectChanges();
         }
       });
@@ -98,6 +106,10 @@ export class SupportComponent implements OnInit {
         next: () => {
           this.tickets.splice(index, 1);
           this.message = 'Ticket removed.';
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.message = 'Could not remove ticket.';
           this.cdr.detectChanges();
         }
       });

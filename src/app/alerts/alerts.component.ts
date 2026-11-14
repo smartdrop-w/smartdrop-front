@@ -96,6 +96,10 @@ export class AlertsComponent implements OnInit {
         this.newAlert = this.emptyAlert();
         this.message = 'Alert added.';
         this.cdr.detectChanges();
+      },
+      error: () => {
+        this.message = 'Could not create alert. Please try again.';
+        this.cdr.detectChanges();
       }
     });
   }
@@ -107,6 +111,10 @@ export class AlertsComponent implements OnInit {
           alert.resolved = true;
           alert.time = 'Resolved just now';
           this.message = `${alert.title} resolved.`;
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.message = 'Could not resolve alert.';
           this.cdr.detectChanges();
         }
       });
@@ -123,6 +131,10 @@ export class AlertsComponent implements OnInit {
         next: () => {
           this.alerts = this.alerts.filter((item) => item !== alert);
           this.message = 'Alert removed.';
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.message = 'Could not remove alert.';
           this.cdr.detectChanges();
         }
       });
@@ -146,10 +158,7 @@ export class AlertsComponent implements OnInit {
   }
 
   private loadSettings() {
-    const saved = localStorage.getItem(this.storageKey);
-    if (saved) {
-      this.settings = JSON.parse(saved);
-    }
+    this.settings = this.authService.readStorageJson(this.storageKey, this.settings);
   }
 
   private loadAlerts() {

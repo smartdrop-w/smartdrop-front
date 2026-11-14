@@ -116,10 +116,31 @@ export class AuthService {
     );
   }
 
+  readStorageJson<T>(key: string, fallback: T): T {
+    const saved = localStorage.getItem(key);
+    if (!saved) return fallback;
+    try {
+      return JSON.parse(saved) as T;
+    } catch {
+      localStorage.removeItem(key);
+      return fallback;
+    }
+  }
+
+  updateCurrentUserName(fullName: string): void {
+    const saved = this.readStorageJson<SmartDropUser | null>(this.currentUserKey, null);
+    if (saved) {
+      saved.fullName = fullName;
+      localStorage.setItem(this.currentUserKey, JSON.stringify(saved));
+    }
+  }
+
   getCurrentUser(): SmartDropUser {
-    const saved = localStorage.getItem(this.currentUserKey);
-    if (saved) return JSON.parse(saved);
-    return { id: 1, email: this.defaultEmail, fullName: 'Alexander' };
+    return this.readStorageJson<SmartDropUser>(this.currentUserKey, {
+      id: 1,
+      email: this.defaultEmail,
+      fullName: 'Alexander',
+    });
   }
 
   isDefaultUser(): boolean {

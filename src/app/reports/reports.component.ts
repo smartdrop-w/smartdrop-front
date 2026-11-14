@@ -120,9 +120,8 @@ export class ReportsComponent implements AfterViewInit {
   }
 
   private load() {
-    const saved = localStorage.getItem(this.storageKey);
-    if (saved) {
-      const data = JSON.parse(saved);
+    const data = this.authService.readStorageJson<any | null>(this.storageKey, null);
+    if (data) {
       this.efficiencyScore = data.efficiencyScore ?? this.efficiencyScore;
       this.waterSaved = data.waterSaved ?? this.waterSaved;
       this.costSaved = data.costSaved ?? this.costSaved;

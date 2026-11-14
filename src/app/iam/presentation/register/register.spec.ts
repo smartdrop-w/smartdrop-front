@@ -2,7 +2,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RegisterComponent } from './register';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
-import { TranslateModule } from '@ngx-translate/core';
 
 describe('Register', () => {
   let component: RegisterComponent;
@@ -10,7 +9,7 @@ describe('Register', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [RegisterComponent, TranslateModule.forRoot()],
+      imports: [RegisterComponent],
       providers: [provideRouter([]), provideHttpClient()]
     }).compileComponents();
 

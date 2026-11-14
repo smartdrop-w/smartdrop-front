@@ -2,7 +2,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReportsComponent } from './reports.component';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { TranslateModule } from '@ngx-translate/core';
 
 describe('ReportsComponent', () => {
   let component: ReportsComponent;
@@ -10,7 +9,7 @@ describe('ReportsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ReportsComponent, TranslateModule.forRoot()],
+      imports: [ReportsComponent],
       providers: [provideHttpClient(), provideHttpClientTesting()]
     }).compileComponents();
 
